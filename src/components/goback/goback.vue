@@ -1,15 +1,20 @@
 <template>
-  <div class="gobackBtn" @click="goBack">
+  <div class="gobackBtn" @click="goBack(url)">
     <span class="iconfont icon-zuojiantou_huaban"></span>
   </div>
 </template>
 
 <script>
 export default {
+  props: ['url'],
   methods: {
-    goBack () {
-      console.log('返回')
-      this.$router.go(-1)
+    goBack (url) {
+      console.log(url)
+      if (url) {
+        this.$router.replace(url)
+      } else {
+        this.$router.go(-1)
+      }
       // window.history.back()
     }
   }
@@ -19,8 +24,8 @@ export default {
 <style lang="less" rel="stylesheet/less">
 .gobackBtn{
   position: fixed;
-  top: 10px;
-  left: 5px;
+  top: 15px;
+  left: 10px;
   .iconfont{
     font-size: 16px;
     color: #aaa;

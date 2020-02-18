@@ -1,9 +1,9 @@
 <template>
-  <div class="topTitleContainer">
+  <nav class="topTitleContainer">
     <slot name="left"></slot>
-    <span class="centerPart ellipsis">{{title}}</span>
+    <span class="centerPart ellipsis" :title="title">{{title}}</span>
     <slot name="right"></slot>
-  </div>
+  </nav>
 </template>
 
 <script>

@@ -44,11 +44,19 @@ export default {
     gotoNav (path) {
       let nowPath = this.$route.path
       if (nowPath !== path) {
+        // let target = path + '?id = ' + Math.random()
+        // console.log(target)
         this.$router.replace(path)
       }
     }
+  },
+  watch: {
+    '$route' (to, from) {
+      // 对路由变化作出响应...
+      let nowPath = this.$route.path
+      this.selected = nowPath
+    }
   }
-  // props: ['gotoNav']
 }
 </script>
 

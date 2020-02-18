@@ -96,3 +96,12 @@ body {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.clearFixed {
+  *zoom: 1;
+}
+.clearFixed::after{
+  content: '';
+  display: table;
+  clear: both;
+}

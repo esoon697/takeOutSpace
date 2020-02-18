@@ -11,23 +11,25 @@
       <!-- tab-container -->
       <mt-tab-container v-model="selected">
         <mt-tab-container-item id="1">
-          <mt-field placeholder="请输入邮箱" type="text" :state="emailState" v-model="email"></mt-field>
-          <p class="errorText" v-show="emailState==='error'?true:false">email格式错误</p>
-          <mt-field placeholder="请输入密码" type="password" :state="passwordState" v-model="password"></mt-field>
-          <p class="errorText" v-show="passwordState==='error'?true:false">密码错误</p>
-          <mt-field placeholder="请输入验证码" v-model="captcha">
-            <img src="" height="45px" width="100px">
+          <mt-field placeholder="请输入用户名" type="text" :state="nameState" v-model="name"></mt-field>
+          <p class="errorText" v-show="nameState==='error'?true:false">用户名格式错误</p>
+          <mt-field placeholder="请输入密码" :type="showOrHide?'text':'password'" :state="pwdState" v-model="pwd">
+            <mt-switch v-model="showOrHide"></mt-switch>
           </mt-field>
-          <button class="loginBtn" @click="passwordLogin">登录</button>
+          <p class="errorText" v-show="pwdState==='error'?true:false">密码至少为8位</p>
+          <mt-field placeholder="请输入验证码" v-model="captcha">
+            <img ref="captchaSvg" src="http://192.168.0.105:4000/captcha" @click="getCaptchaSvg">
+          </mt-field>
+          <button class="loginBtn" @click="pwdLogin">登录</button>
           <p class="aboutUs">关于我们</p>
         </mt-tab-container-item>
         <mt-tab-container-item id="2">
           <mt-field placeholder="请输入手机号" type="tel" v-model="phone">
-            <p :class="phoneState==='success'?'captchaBtn':'captchaBtn-disable'" @click="getCaptcha()" v-if="!clickLock">获取验证码</p>
-            <p class="captchaBtn-lock" v-else>{{lockTime}}s</p>
+            <p :class="phoneState==='success'?'captchaBtn':'captchaBtn-disable'" @click="getCode()" v-if="!lockTime">获取验证码</p>
+            <p class="captchaBtn-lock" v-else>已发送{{lockTime}}s</p>
           </mt-field>
           <p class="errorText" v-show="phoneState==='error'?true:false">手机号格式错误</p>
-          <mt-field placeholder="验证码" type="text" v-model="captcha"></mt-field>
+          <mt-field placeholder="验证码" type="text" v-model="sendcode"></mt-field>
           <button class="loginBtn" @click="messageLogin">登录</button>
           <p class="aboutUs">关于我们</p>
         </mt-tab-container-item>
@@ -40,47 +42,69 @@
 <script>
 import goBack from '../../components/goback/goback'
 import { MessageBox } from 'mint-ui'
+// import {mapState} from 'vuex'
+import {
+  // reqLoginPwd,
+  reqLoginSms
+} from '../../api/index'
+import localStore from '../../localStorage'
+
 export default {
   data () {
     return {
       selected: '1',
-      email: '',
-      password: '',
+      name: '',
+      pwd: '',
       phone: '',
       captcha: '',
-      emailState: '',
-      passwordState: '',
+      nameState: '',
+      pwdState: '',
       phoneState: '',
-      clickLock: false,
-      lockTime: 60
+      lockTime: 0,
+      intervalId: '',
+      sendcode: '',
+      showOrHide: false,
+      user: ''
     }
   },
   methods: {
-    getCaptcha () {
-      if (this.phoneState === 'success') {
-        if (this.clickLock) {
-          return
-        }
-        this.clickLock = true
-        let timer = setInterval(() => {
+    getCode () {
+      // 手机号格式正确且没有计时时运行
+      if (this.phoneState === 'success' && !this.lockTime) {
+        this.lockTime = 30
+        this.intervalId = setInterval(() => {
           this.lockTime -= 1
           if (this.lockTime === 0) {
-            clearInterval(timer)
-            this.clickLock = false
-            this.lockTime = 60
+            clearInterval(this.intervalId)
           }
         }, 1000)
-      } else {
-        this.phoneState = 'error'
+        // 发送ajax请求获取验证码
+        this.$store.dispatch('reqSendcode', this.phone)
       }
     },
-    passwordLogin () {
-      if (this.emailState === 'success') {
-        if (this.passwordState === 'success') {
-          if (this.captcha === 'success') {
-            console.log('login success')
+    getCaptchaSvg () {
+      this.$refs.captchaSvg.src = 'http://192.168.0.105:4000/captcha?time=' + Date.now()
+    },
+    // async pwdLogin (param) {
+    pwdLogin (param) {
+      if (this.nameState === 'success') {
+        if (this.pwdState === 'success') {
+          if (this.captcha) {
+            // const res = await reqLoginPwd(param)
+            // if (res.code === 0) {
+            //   console.log('success')
+            //   this.user = res.data
+            //   this.$router.replace('/profile')
+            // } else {
+            //   MessageBox('错误', res.msg)
+            // }
+            // const name = this.name
+            this.$store.dispatch('reqSaveUserinfo', {name: this.name})
+            localStore.save('userinfo', {name: this.name, phone: this.phone})
+            this.$router.replace({name: 'profile'})
           } else {
-            MessageBox('提示', '验证码有误')
+            MessageBox('提示', '验证码不能为空')
+            this.getCaptchaSvg()
           }
         } else {
           MessageBox('提示', '账号或密码有误')
@@ -89,33 +113,49 @@ export default {
         MessageBox('提示', '账号或密码有误')
       }
     },
-    messageLogin () {
+    async messageLogin (param) {
       if (this.phoneState === 'success') {
-        if (this.captcha === 'success') {
+        if (this.sendcode) {
           console.log('login success')
+          const res = await reqLoginSms()
+          if (res.code === 0) {
+            console.log('success', res)
+            // const phone = this.phone
+            this.$store.dispatch('reqSaveUserinfo', {phone: this.phone})
+            localStore.save('userinfo', {name: this.name, phone: this.phone, userid: Date.parse(new Date())})
+            this.$router.replace({name: 'profile'})
+          } else {
+            MessageBox('错误', res.msg)
+          }
         } else {
           MessageBox('提示', '验证码有误')
         }
       } else {
         MessageBox('提示', '手机号有误')
       }
+      if (this.lockTime) {
+        this.lockTime = 0
+        clearInterval(this.intervalId)
+        this.intervalId = ''
+      }
     }
   },
   watch: {
-    email () {
-      var re = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/
-      if (re.test(this.email)) {
-        this.emailState = 'success'
+    name (value) {
+      // var re = /^[A-Za-z\d]+([-_.][A-Za-z\d]+)*@([A-Za-z\d]+[-.])+[A-Za-z\d]{2,4}$/ // 邮箱正则表达式
+      var re = /^1[3456789]\d{9}$/
+      if (re.test(value)) {
+        this.nameState = 'success'
       } else {
-        this.emailState = 'error'
+        this.nameState = 'error'
       }
     },
-    password () {
+    pwd () {
       var re = /^[a-zA-Z\d_]{8,}$/
-      if (re.test(this.password)) {
-        this.passwordState = 'success'
+      if (re.test(this.pwd)) {
+        this.pwdState = 'success'
       } else {
-        this.passwordState = 'error'
+        this.pwdState = 'error'
       }
     },
     phone () {
@@ -183,6 +223,10 @@ export default {
         &:first-child{
           margin-top: 0;
         }
+        .mint-switch-input:checked + .mint-switch-core{
+          border-color: @themeColor;
+          background-color: @themeColor;
+        }
         .captchaBtn{
           color: @themeColor;
         }
@@ -190,7 +234,7 @@ export default {
           color: #aaa;
         }
         .captchaBtn-lock{
-          width: 50px;
+          width: 80px;
           height: 30px;
           text-align: center;
           line-height: 30px;

@@ -11,10 +11,11 @@
             </p>
           </div>
           <div class="topCenter">
-            <p>登录/注册</p>
+            <p v-if="Object.keys(this.userinfo).length">{{userinfo.name || userinfo.phone}}</p>
+            <p v-else>登录/注册</p>
             <p>
               <span class="phone-icon iconfont icon-webicon205"></span>
-              <span>暂无绑定的手机号</span>
+              <span>{{Object.keys(this.userinfo).length && userinfo.phone? '已绑定':'暂无绑定的手机号'}}</span>
             </p>
           </div>
           <div class="topRight">
@@ -57,6 +58,7 @@
           <span class="serviceCenter">服务中心</span>
           <span class="iconfont icon-youjiantou_huaban"></span>
         </div>
+        <div v-show="Object.keys(this.userinfo).length" class="listItem loginOut" @click="loginOut">退出登录</div>
       </div>
     </div>
   </div>
@@ -64,16 +66,38 @@
 
 <script>
 import topTitle from '../../components/top_title/top_title'
+import { MessageBox, Toast } from 'mint-ui'
+// import { mapState } from 'vuex'
+import localStore from '../../localStorage'
 export default {
   data () {
     return {
-      portrait: ''
+      portrait: '',
+      userinfo: this.$store.state.userinfo
     }
+  },
+  computed: {
+    // ...mapState([])
+  },
+  mounted () {
+    this.userinfo = localStore.get('userinfo')
   },
   methods: {
     gotoLogin () {
       console.log('去登录了')
-      this.$router.push('login')
+      if (!Object.keys(this.userinfo).length) {
+        this.$router.push('login')
+      }
+    },
+    loginOut () {
+      MessageBox.confirm('确定执行此操作?').then(action => {
+        localStorage.removeItem('userinfo')
+        this.userinfo = ''
+        Toast('退出登录')
+      },
+      action => {
+        console.log('取消操作')
+      })
     }
   },
   components: {topTitle}
@@ -233,6 +257,12 @@ export default {
           color: #ccc;
           font-size: 16px;
         }
+      }
+      .loginOut{
+        color: #fff;
+        background-color: rgb(255, 60, 60);
+        text-align: center;
+        margin-top: 10px;
       }
     }
   }
