@@ -102,8 +102,22 @@ export default {
     if (Object.keys(userinfo).length) {
       this.loginState = !this.loginState
     }
+    let path = this.$route.path
+    let scrollY = sessionStorage.getItem('scrollY' + path)
+    window.scroll(0, scrollY)
+  },
+  beforeRouteLeave (to, from, next) {
+    let path = this.$route.path
+    let scrollY = window.scrollY
+    sessionStorage.setItem('scrollY' + path, scrollY)
+    next()
   },
   methods: {
+    // getScroll () {
+    //   let scrollTop = document.querySelector('.homeContainer').scrollTop
+    //   sessionStorage.setItem('scrollTop', scrollTop)
+    //   console.log('scrollTop', scrollTop)
+    // },
     handleChange (index) {
       console.log(index)
     },
@@ -121,6 +135,7 @@ export default {
 
 <style lang="less" rel="stylesheet/less">
 .homeRouterContainer{
+  overflow: auto;
   .homeContentContainer{
     padding: 50px 0;
     background-color: #fff;

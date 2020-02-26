@@ -3,13 +3,15 @@
     <topTitle title='搜索'/>
     <div class="searchContentContainer">
       <div class="searchWrapper">
-        <input type="text" class="searchItem" placeholder="搜索" v-model="searchVal">
+        <input type="text" class="searchItem" placeholder="搜索" v-model="searchVal"
+        @focus="getFocus" @blur="getBlur">
         <button class="searchBtn" @click="searchHandler">搜索</button>
       </div>
     </div>
     <section class="list" v-if="!startSearch">
       <ul class="list_container">
         <!--:to="'/shop?id='+item.id"-->
+        <!-- {name: 'shop', params:{id:item.id}} -->
         <router-link :to="{path:'/shop', query:{id:item.id}}" tag="li" v-for="item in searchShops" :key="item.id" class="list_li">
           <section class="item_left">
             <img :src="imgBaseUrl + item.image_path" class="restaurant_img">
@@ -40,7 +42,8 @@ export default {
     return {
       searchVal: '',
       imgBaseUrl: 'http://cangdu.org:8001/img/',
-      startSearch: false
+      startSearch: false,
+      isFocus: false
     }
   },
   computed: {
@@ -54,6 +57,12 @@ export default {
     this.$store.dispatch('clearSearchShops')
   },
   methods: {
+    getFocus () {
+      this.$store.dispatch('changeFocus', true)
+    },
+    getBlur () {
+      this.$store.dispatch('changeFocus', false)
+    },
     _initScroll () {
       this.$nextTick(() => {
         if (!this.searchScroll) {

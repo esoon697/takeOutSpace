@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../pages/Home/Home'
-import Search from '../pages/Search/Search'
-import Order from '../pages/Order/Order'
-import Profile from '../pages/Profile/Profile'
+// import Home from '../pages/Home/Home'
+// import Search from '../pages/Search/Search'
+// import Order from '../pages/Order/Order'
+// import Profile from '../pages/Profile/Profile'
 import Login from '../pages/Login/Login'
 import Shop from '../pages/Shop/Shop'
 
@@ -11,10 +11,10 @@ import ShopGoods from '../pages/Shop/shopGoods/shopGoods'
 import ShopRatings from '../pages/Shop/shopRatings/shopRatings'
 import ShopInfo from '../pages/Shop/shopInfo/shopInfo'
 // 路由懒加载
-// const Home = () => import('../pages/Home/Home')
-// const Search = () => import('../pages/Search/Search')
-// const Order = () => import('../pages/Order/Order')
-// const Profile = () => import('../pages/Profile/Profile')
+const Home = () => import('../pages/Home/Home')
+const Search = () => import('../pages/Search/Search')
+const Order = () => import('../pages/Order/Order')
+const Profile = () => import('../pages/Profile/Profile')
 
 Vue.use(VueRouter)
 
@@ -38,7 +38,6 @@ export default new VueRouter({
     { path: '/login',
       component: Login },
     { path: '/shop',
-      name: 'shop',
       component: Shop,
       props: true,
       children: [
@@ -61,11 +60,19 @@ export default new VueRouter({
           props: true
         },
         {
-          path: '',
+          path: '/',
           redirect: 'shopGoods'
         }
       ] },
     { path: '/',
       redirect: '/home'}
   ]
+  // scrollBehavior (to, from, savedPosition) {
+  //   console.log(savedPosition)
+  //   if (savedPosition) {
+  //     return savedPosition
+  //   } else {
+  //     return { x: 0, y: 0 }
+  //   }
+  // }
 })

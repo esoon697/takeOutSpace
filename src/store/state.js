@@ -17,5 +17,7 @@ export default {
   shopCart: [], // 购物车
   currentScrollY: 0, // 当前商品列表滚动的位置
   searchShops: [], // 商家搜索结果
-  orders: [] // 订单
+  orders: [], // 订单
+  isFocus: false,
+  routerLoading: false
 }

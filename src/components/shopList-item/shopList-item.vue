@@ -56,8 +56,9 @@ export default {
   methods: {
     goShop (param) {
       let shopId = param.id
-      // this.$router.push({path: '/shop/shopGoods', query: {id: shopId}})
-      this.$router.push({path: '/shop?id=' + shopId})
+      this.$router.push({path: '/shop', query: {id: shopId}})
+      // this.$router.push({name: 'shop', params: {id: shopId}})
+      // this.$router.push({path: '/shop?id=' + shopId})
     }
   }
 }

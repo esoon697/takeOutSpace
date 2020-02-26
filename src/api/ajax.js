@@ -21,9 +21,7 @@ export default function ajax (url, data = {}, type = 'GET') {
         url,
         timeout: 5000
       })
-      console.log('GET', url)
     } else {
-      console.log(url, data)
       promise = axios({
         method: 'post',
         url,

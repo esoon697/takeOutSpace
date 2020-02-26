@@ -1,6 +1,8 @@
 import ajax from './ajax'
 // const BASE_URL = '/api'
 // const BASE_URL = 'http://192.168.0.105:4000'
+// console.log(process.env.API_HOST)
+// const BASE_URL = process.env.API_HOST
 
 // 1、根据经纬度获取位置详情](#1根据经纬度获取位置详情)
 // export const reqAddress = (geohash) => ajax(BASE_URL + '/position/' + geohash)

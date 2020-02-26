@@ -23,6 +23,16 @@ Vue.use(VueLazyload, {
   attempt: 2
 })
 Vue.use(VueTouch, {name: 'v-touch'})
+
+// 全局路由加载loading
+// router.beforeEach((to, from, next) => {
+//   store.state.routerLoading = true
+//   next()
+// })
+// router.afterEach((to, from, next) => {
+//   store.state.routerLoading = false
+//   next()
+// })
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

@@ -79,5 +79,11 @@ export default {
   // 删除订单
   delOrder (state, {order}) {
     state.orders.splice(state.orders.indexOf(order), 1)
+  },
+  changeFocus (state, {focusState}) {
+    state.isFocus = focusState
+  },
+  changeRouterLoading (state) {
+    state.routerLoading = !state.routerLoading
   }
 }

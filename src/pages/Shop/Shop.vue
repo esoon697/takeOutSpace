@@ -116,7 +116,6 @@
 import goback from '../../components/goback/goback'
 import { mapState } from 'vuex'
 export default {
-  props: ['shopId'],
   components: {goback},
   data () {
     return {

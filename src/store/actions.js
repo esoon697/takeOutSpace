@@ -114,5 +114,11 @@ export default {
   // 删除订单
   delOrder ({commit}, order) {
     commit('delOrder', {order})
+  },
+  changeFocus ({commit}, focusState) {
+    commit('changeFocus', {focusState})
+  },
+  changeRouterLoading ({commit}) {
+    commit('changeRouterLoading')
   }
 }
